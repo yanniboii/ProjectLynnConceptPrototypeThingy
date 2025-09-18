@@ -1,0 +1,369 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+#define QUATERNION_IDENTITY float4(0, 0, 0, 1)
+#define EPSILON 1e-5f
+#define M_PI 3.1415926535897932384626433
+
+struct Boid
+{
+    float3 pos;
+    float3 velocity;
+    float4 rotation;
+};
+
+RWStructuredBuffer<Boid> Boids;
+
+cbuffer Params
+{
+    float deltaTime;
+    float time;
+    
+    int boidAmount;
+    
+    float3 boundsExtents;
+    float3 boundsCenter;
+    
+    float3 followTarget;
+    float followStrength;    
+    
+    float3 avoidTarget;
+    float avoidStrength;
+    
+    float forwardSpeed;
+    float rotationSpeed;
+    
+    float avoidanceRadius;
+    float cohesionRadius;
+    float alignmentRadius;
+    
+    float boundsStrength;
+    float avoidanceStrength;
+    float cohesionStrength;
+    float alignmentStrength;
+
+    float seed;
+};
+
+bool boidsInitialized;
+
+#if 1 // https://gist.github.com/mattatz/40a91588d5fb38240403f198a938a593
+float4 q_look_at(float3 forward, float3 up)
+{
+    float3 right = normalize(cross(forward, up));
+    up = normalize(cross(forward, right));
+
+    float m00 = right.x;
+    float m01 = right.y;
+    float m02 = right.z;
+    float m10 = up.x;
+    float m11 = up.y;
+    float m12 = up.z;
+    float m20 = forward.x;
+    float m21 = forward.y;
+    float m22 = forward.z;
+
+    float num8 = (m00 + m11) + m22;
+    float4 q = QUATERNION_IDENTITY;
+    if (num8 > 0.0)
+    {
+        float num = sqrt(num8 + 1.0);
+        q.w = num * 0.5;
+        num = 0.5 / num;
+        q.x = (m12 - m21) * num;
+        q.y = (m20 - m02) * num;
+        q.z = (m01 - m10) * num;
+        return q;
+    }
+
+    if ((m00 >= m11) && (m00 >= m22))
+    {
+        float num7 = sqrt(((1.0 + m00) - m11) - m22);
+        float num4 = 0.5 / num7;
+        q.x = 0.5 * num7;
+        q.y = (m01 + m10) * num4;
+        q.z = (m02 + m20) * num4;
+        q.w = (m12 - m21) * num4;
+        return q;
+    }
+
+    if (m11 > m22)
+    {
+        float num6 = sqrt(((1.0 + m11) - m00) - m22);
+        float num3 = 0.5 / num6;
+        q.x = (m10 + m01) * num3;
+        q.y = 0.5 * num6;
+        q.z = (m21 + m12) * num3;
+        q.w = (m20 - m02) * num3;
+        return q;
+    }
+
+    float num5 = sqrt(((1.0 + m22) - m00) - m11);
+    float num2 = 0.5 / num5;
+    q.x = (m20 + m02) * num2;
+    q.y = (m21 + m12) * num2;
+    q.z = 0.5 * num5;
+    q.w = (m01 - m10) * num2;
+    return q;
+}
+
+float4 q_slerp(in float4 a, in float4 b, float t)
+{
+    // if either input is zero, return the other.
+    if (length(a) == 0.0)
+    {
+        if (length(b) == 0.0)
+        {
+            return QUATERNION_IDENTITY;
+        }
+        return b;
+    }
+    else if (length(b) == 0.0)
+    {
+        return a;
+    }
+
+    float cosHalfAngle = a.w * b.w + dot(a.xyz, b.xyz);
+
+    if (cosHalfAngle >= 1.0 || cosHalfAngle <= -1.0)
+    {
+        return a;
+    }
+    else if (cosHalfAngle < 0.0)
+    {
+        b.xyz = -b.xyz;
+        b.w = -b.w;
+        cosHalfAngle = -cosHalfAngle;
+    }
+
+    float blendA;
+    float blendB;
+    if (cosHalfAngle < 0.99)
+    {
+        // do proper slerp for big angles
+        float halfAngle = acos(cosHalfAngle);
+        float sinHalfAngle = sin(halfAngle);
+        float oneOverSinHalfAngle = 1.0 / sinHalfAngle;
+        blendA = sin(halfAngle * (1.0 - t)) * oneOverSinHalfAngle;
+        blendB = sin(halfAngle * t) * oneOverSinHalfAngle;
+    }
+    else
+    {
+        // do lerp if angle is really small.
+        blendA = 1.0 - t;
+        blendB = t;
+    }
+
+    float4 result = float4(blendA * a.xyz + blendB * b.xyz, blendA * a.w + blendB * b.w);
+    if (length(result) > 0.0)
+    {
+        return normalize(result);
+    }
+    return QUATERNION_IDENTITY;
+}
+
+float4x4 quaternion_to_matrix(float4 quat)
+{
+    float4x4 m = float4x4(float4(0, 0, 0, 0), float4(0, 0, 0, 0), float4(0, 0, 0, 0), float4(0, 0, 0, 0));
+
+    float x = quat.x, y = quat.y, z = quat.z, w = quat.w;
+    float x2 = x + x, y2 = y + y, z2 = z + z;
+    float xx = x * x2, xy = x * y2, xz = x * z2;
+    float yy = y * y2, yz = y * z2, zz = z * z2;
+    float wx = w * x2, wy = w * y2, wz = w * z2;
+
+    m[0][0] = 1.0 - (yy + zz);
+    m[0][1] = xy - wz;
+    m[0][2] = xz + wy;
+
+    m[1][0] = xy + wz;
+    m[1][1] = 1.0 - (xx + zz);
+    m[1][2] = yz - wx;
+
+    m[2][0] = xz - wy;
+    m[2][1] = yz + wx;
+    m[2][2] = 1.0 - (xx + yy);
+
+    m[3][3] = 1.0;
+
+    return m;
+}
+
+#endif
+
+#if 1 // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+// this implementation assumes normalized quaternion
+// converts to Euler angles in 3-2-1 sequence
+float3 ToEulerAngles(float4 q)
+{
+    float3 angles;
+
+    // roll (x-axis rotation)
+    double sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
+    double cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
+    angles.x = atan2(sinr_cosp, cosr_cosp);
+
+    // pitch (y-axis rotation)
+    double sinp = sqrt(1 + 2 * (q.w * q.y - q.x * q.z));
+    double cosp = sqrt(1 - 2 * (q.w * q.y - q.x * q.z));
+    angles.y = 2 * atan2(sinp, cosp) - M_PI / 2;
+
+    // yaw (z-axis rotation)
+    double siny_cosp = 2 * (q.w * q.z + q.x * q.y);
+    double cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
+    angles.z = atan2(siny_cosp, cosy_cosp);
+
+    return angles;
+}
+
+#endif
+
+// Safe normalize: returns zero vector if length is too small
+float3 safeNormalize(float3 v)
+{
+    float len = length(v);
+    if (len < EPSILON)
+        return float3(0, 0, 0);
+    return v / len;
+}
+
+// Checks if number is valid.
+bool IsNaN(float val)
+{
+    uint bits = asuint(val);
+    uint exponent = (bits << 1) >> 24;
+    uint mantissa = (bits << 9) >> 9;
+    return exponent == 255 && mantissa > 0;
+}
+
+float nrand(float2 uv)
+{
+    return frac(sin(dot(uv, float2(12.9898, 78.233))) * 43758.5453);
+}
+
+// Creates boids in a random area called on the firt index of the first dispatch
+void CreateBoids()
+{
+    for (int i = 0; i < boidAmount; i++)
+    {
+        float3 pos;
+        float3 direction;
+        
+        pos = float3(   nrand(float2(i + 1, seed))*10,
+                        nrand(float2(i + 2, seed))*10,
+                        nrand(float2(i + 3, seed)))*10;
+
+        direction = float3(0,0,-1);
+
+        Boid boid;
+        boid.pos = pos;
+        boid.velocity = direction;
+        boid.rotation = QUATERNION_IDENTITY;
+
+        Boids[i] = boid;
+    }
+}
+
+// Calculates the bounds for the boids and guides them to stay inside
+float3 ToBounds(float3 position)
+{
+    float3 offset = position - boundsCenter;
+    float3 force = float3(0,0,0);
+
+    if (abs(offset.x) > boundsExtents.x/2)
+        force.x = -sign(offset.x);
+
+    if (abs(offset.y) > boundsExtents.y/2)
+        force.y = -sign(offset.y);
+
+    if (abs(offset.z) > boundsExtents.z/2)
+        force.z = -sign(offset.z);
+
+    return safeNormalize(force);
+}
+
+float GetExponentialStrength(float dist, float k, float tau)
+{
+    float strength = k * (1.0 - exp(-dist / tau));
+    
+    return strength;
+}
+
+// Calculates the boid position, velocity, and direction
+void BoidCalculation(int self)
+{
+    float3 selfPos = Boids[self].pos;
+    float3 selfDirection = Boids[self].velocity;
+    float4 selfRotation = Boids[self].rotation;
+    
+    float3 avoidanceDirection = float3(0,0,0);
+    float3 cohesionDirection = float3(0, 0, 0);
+    float3 alignmentDirection = float3(0, 0, 0);
+
+    float3 middlePoint = selfPos;
+    float3 alignmentTotal = selfDirection;
+    float3 followDirection = followTarget - selfPos;
+    float3 avoidDirection = selfPos - avoidTarget;
+
+    for (int i = 0; i < boidAmount; i++)
+    {
+        if (i == self)
+            continue;
+        
+        float3 otherPos = Boids[i].pos;
+        float3 distanceToBoid = otherPos - selfPos;      
+        float dist = length(distanceToBoid);
+        
+        if (dist < avoidanceRadius)
+        {
+            float avoidanceStrength = 1.0f - (length(distanceToBoid) / avoidanceRadius);
+            avoidanceDirection += -distanceToBoid * avoidanceStrength;
+        }
+        if (dist < cohesionRadius)
+        {
+            middlePoint += otherPos;
+        }
+        if (dist < alignmentRadius)
+        {
+            alignmentTotal += Boids[i].velocity;
+        }
+    }
+    cohesionDirection = selfPos - middlePoint;
+    alignmentDirection = alignmentTotal;
+    
+    float3 steeringDirection = safeNormalize(avoidanceDirection) * avoidanceStrength;
+    steeringDirection += safeNormalize(cohesionDirection) * cohesionStrength;
+    steeringDirection += safeNormalize(alignmentDirection) * alignmentStrength;
+    steeringDirection += safeNormalize(followDirection) * GetExponentialStrength(length(followDirection), followStrength, 2.0f);
+    steeringDirection += safeNormalize(avoidDirection) * GetExponentialStrength(length(avoidDirection), avoidStrength, 2.0f);
+    steeringDirection += ToBounds(selfPos) * boundsStrength;
+    
+    steeringDirection = safeNormalize(steeringDirection);
+    
+    float4 targetRotation = q_look_at(steeringDirection, float3(0,1,0));
+    selfRotation = q_slerp(selfRotation, targetRotation, rotationSpeed);
+    float3 eulerRotation = ToEulerAngles(selfRotation);
+
+    float3 newVelocity = safeNormalize(steeringDirection) * forwardSpeed;;
+    Boids[self].pos += newVelocity * deltaTime;
+    Boids[self].velocity = eulerRotation;
+    Boids[self].rotation = selfRotation;
+
+}
+
+[numthreads(128,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    int index = id.x;
+    
+    if (!boidsInitialized && index == 0)
+    {
+        CreateBoids();
+    }
+    
+    if (index >= boidAmount)
+        return;
+    
+    BoidCalculation(index);
+
+}
