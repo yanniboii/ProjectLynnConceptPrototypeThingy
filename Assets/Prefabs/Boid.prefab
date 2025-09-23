@@ -133,6 +133,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boundsExtents: {x: 40, y: 20, z: 40}
+  boundsRadius: 100
   boundsCenter: {fileID: 0}
   forwardSpeed: 0.2
   rotationSpeed: 0.02

@@ -22,6 +22,7 @@ cbuffer Params
     int boidAmount;
     
     float3 boundsExtents;
+    float boundsRadius;
     float3 boundsCenter;
     
     float3 followTarget;
@@ -282,6 +283,18 @@ float3 ToBounds(float3 position)
     return safeNormalize(force);
 }
 
+// Calculates the bounds for the boids and guides them to stay inside
+float3 ToBoundsRadius(float3 position)
+{
+    float3 offset = position - boundsCenter;
+    float3 force = float3(0, 0, 0);
+
+    if (length(offset) > boundsRadius)
+        force = -offset;
+
+    return safeNormalize(force);
+}
+
 float GetExponentialStrength(float dist, float k, float tau)
 {
     float strength = k * (1.0 - exp(-dist / tau));
@@ -302,6 +315,7 @@ void BoidCalculation(int self)
 
     float3 middlePoint = selfPos;
     float3 alignmentTotal = selfDirection;
+    
     float3 followDirection = followTarget - selfPos;
     float3 avoidDirection = selfPos - avoidTarget;
 
@@ -336,7 +350,7 @@ void BoidCalculation(int self)
     steeringDirection += safeNormalize(alignmentDirection) * alignmentStrength;
     steeringDirection += safeNormalize(followDirection) * GetExponentialStrength(length(followDirection), followStrength, 2.0f);
     steeringDirection += safeNormalize(avoidDirection) * GetExponentialStrength(length(avoidDirection), avoidStrength, 2.0f);
-    steeringDirection += ToBounds(selfPos) * boundsStrength;
+    steeringDirection += ToBoundsRadius(selfPos) * boundsStrength;
     
     steeringDirection = safeNormalize(steeringDirection);
     

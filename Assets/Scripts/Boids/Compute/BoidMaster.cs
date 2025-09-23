@@ -6,6 +6,7 @@ public class BoidMaster : MonoBehaviour
     [SerializeField] private int boidAmount;
 
     [SerializeField] private Vector3 boundsExtents = new Vector3(20, 10, 20);
+    [SerializeField] private float boundsRadius;
     [SerializeField] private Vector3 boundsCenter = Vector3.zero;
 
     [SerializeField] private Transform followTarget;
@@ -79,6 +80,7 @@ public class BoidMaster : MonoBehaviour
         boidComputeShader.SetInt("boidAmount", boidAmount);
 
         boidComputeShader.SetVector("boundsExtents", boundsExtents);
+        boidComputeShader.SetFloat("boundsRadius", boundsRadius);
         boidComputeShader.SetVector("boundsCenter", boundsCenter);
 
         boidComputeShader.SetVector("followTarget", followTarget.position);

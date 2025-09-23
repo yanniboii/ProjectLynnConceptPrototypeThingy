@@ -5,6 +5,7 @@ using UnityEngine;
 public class BoidBehaviour : MonoBehaviour
 {
     [SerializeField] private Vector3 boundsExtents;
+    [SerializeField] private float boundsRadius;
     [SerializeField] public Transform boundsCenter;
     [SerializeField] private float forwardSpeed;
     [SerializeField] private float rotationSpeed;
@@ -56,7 +57,7 @@ public class BoidBehaviour : MonoBehaviour
         direction += avoidanceDirection.normalized * avoidanceStrength;
         direction += cohesionDirection.normalized * cohesionStrength;
         direction += alignmentDirection.normalized * alignmentStrength;
-        direction += ToBounds(transform.position) * boundsStrength;
+        direction += ToBoundsRadius(transform.position) * boundsStrength;
 
 
         Quaternion targetRotation = Quaternion.LookRotation(direction.normalized);
@@ -143,5 +144,26 @@ public class BoidBehaviour : MonoBehaviour
             force.z = -Mathf.Sign(offset.z);
 
         return force.normalized;
+    }
+
+    Vector3 ToBoundsRadius(Vector3 position)
+    {
+        Vector3 offset = position - boundsCenter.position;
+        Vector3 force = Vector3.zero;
+
+        if (offset.magnitude > boundsRadius)
+            force = -offset;
+
+        return force.normalized;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(boundsCenter.position, boundsRadius);
+
+        Gizmos.color = Color.plum;
+        Vector3 pos = boundsCenter.position + new Vector3(boundsRadius / 2, boundsRadius / 2, boundsRadius / 2);
+        Gizmos.DrawWireSphere(pos, boundsRadius);
     }
 }
