@@ -9,6 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2aff585bd91a40344b30bf1269595b2c, type: 3}
+  m_Script: {fileID: 11500000, guid: bdccfaf564dbc9f4fb584e018048c013, type: 3}
   m_Name: Allboids
   m_EditorClassIdentifier: 

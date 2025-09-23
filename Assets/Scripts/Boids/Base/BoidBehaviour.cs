@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class BoidBehaviour : MonoBehaviour
 {
-    [SerializeField] Vector3 boundsExtents = new Vector3(20, 10, 20);
+    [SerializeField] private Vector3 boundsExtents;
+    [SerializeField] public Transform boundsCenter;
     [SerializeField] private float forwardSpeed;
     [SerializeField] private float rotationSpeed;
 
@@ -35,7 +36,6 @@ public class BoidBehaviour : MonoBehaviour
     Vector3 cohesionDirection;
     Vector3 alignmentDirection;
 
-    Vector3 boundsCenter = Vector3.zero;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -130,7 +130,7 @@ public class BoidBehaviour : MonoBehaviour
 
     Vector3 ToBounds(Vector3 position)
     {
-        Vector3 offset = position - boundsCenter;
+        Vector3 offset = position - boundsCenter.position;
         Vector3 force = Vector3.zero;
 
         if (Mathf.Abs(offset.x) > boundsExtents.x)

@@ -13,6 +13,7 @@ public class BoidSpawner : MonoBehaviour
         {
             Vector3 randomRadius = new Vector3(Random.Range(-radius, radius), Random.Range(-radius, radius), Random.Range(-radius, radius));
             Vector3 spawnLocation = randomRadius + position.position;
+            boidGO.boundsCenter = transform;
             Instantiate(boidGO.gameObject, spawnLocation, Quaternion.identity);
         }
     }

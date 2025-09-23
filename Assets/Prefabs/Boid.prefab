@@ -132,7 +132,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9e755b452b072c45b9fcdfc4338fec1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundsExtents: {x: 80, y: 10, z: 40}
+  boundsExtents: {x: 40, y: 20, z: 40}
+  boundsCenter: {fileID: 0}
   forwardSpeed: 0.2
   rotationSpeed: 0.02
   avoidanceRadius: 1
@@ -143,7 +144,7 @@ MonoBehaviour:
   cohesionStrength: 0.45
   alignmentStrength: 0.55
   direction: {x: 0, y: 0, z: 0}
-  allBoidsValue: {fileID: 11400000, guid: 7da14df7c57303741b383e2b723ff063, type: 2}
+  allBoidsValue: {fileID: 11400000, guid: 183a9a88954037341a296a2a85008bd9, type: 2}
   debug: 0
 --- !u!1 &2996658371446921560
 GameObject:
