@@ -16,7 +16,7 @@ public class SplineFollow : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         Quaternion targetRotation = Quaternion.LookRotation(CalculateCurveDirection().normalized);
 

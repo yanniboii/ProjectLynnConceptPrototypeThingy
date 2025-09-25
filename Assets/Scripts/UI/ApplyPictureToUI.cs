@@ -7,8 +7,6 @@ public class ApplyPictureToUI : MonoBehaviour
     [SerializeField] private EventHolder onPictureTaken;
 
     [SerializeField] private RawImage rawImage;
-    [SerializeField] private int w;
-    [SerializeField] private int h;
 
     private void OnEnable()
     {
@@ -22,7 +20,7 @@ public class ApplyPictureToUI : MonoBehaviour
 
     private void SetPicture()
     {
-
+        rawImage.color = Color.white;
         rawImage.texture = renderTextureValue.value;
     }
 }

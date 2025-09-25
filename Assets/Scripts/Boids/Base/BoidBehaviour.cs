@@ -46,7 +46,7 @@ public class BoidBehaviour : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         direction = Vector3.zero;
 
