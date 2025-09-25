@@ -125,7 +125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bezierCurve: {fileID: 0}
-  speed: 0.37
+  speed: 0.123333335
   pointRange: 0.23
 --- !u!114 &3711109187523083180
 MonoBehaviour:
