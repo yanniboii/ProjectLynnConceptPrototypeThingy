@@ -22,43 +22,43 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 561cc3ed0116cac488ccdf3e6bd5c010, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -28.75727
+      value: -28.748043
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 561cc3ed0116cac488ccdf3e6bd5c010, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 37.010807
+      value: 39.596943
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 561cc3ed0116cac488ccdf3e6bd5c010, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -17.916
+      value: -16.15619
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 561cc3ed0116cac488ccdf3e6bd5c010, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071057
+      value: 0.98532623
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 561cc3ed0116cac488ccdf3e6bd5c010, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.7071057
+      value: -0.1706725
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 561cc3ed0116cac488ccdf3e6bd5c010, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.0012620379
+      value: 0.00030461853
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 561cc3ed0116cac488ccdf3e6bd5c010, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.0012620416
+      value: -0.0017586064
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 561cc3ed0116cac488ccdf3e6bd5c010, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 90.201996
+      value: 199.65399
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 561cc3ed0116cac488ccdf3e6bd5c010, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 90
+      value: 180.073
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 561cc3ed0116cac488ccdf3e6bd5c010, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 90
+      value: 179.783
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 561cc3ed0116cac488ccdf3e6bd5c010, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -71,5 +71,45 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 561cc3ed0116cac488ccdf3e6bd5c010, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6784555270061517129}
   m_SourcePrefab: {fileID: 100100000, guid: 561cc3ed0116cac488ccdf3e6bd5c010, type: 3}
+--- !u!23 &5140265890601630201 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 561cc3ed0116cac488ccdf3e6bd5c010, type: 3}
+  m_PrefabInstance: {fileID: 5806390296581203325}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6653251408868038700 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 561cc3ed0116cac488ccdf3e6bd5c010, type: 3}
+  m_PrefabInstance: {fileID: 5806390296581203325}
+  m_PrefabAsset: {fileID: 0}
+--- !u!205 &6784555270061517129
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6653251408868038700}
+  serializedVersion: 2
+  m_LocalReferencePoint: {x: 0, y: 0, z: 0}
+  m_Size: 1
+  m_FadeMode: 0
+  m_AnimateCrossFading: 0
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.6
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 5140265890601630201}
+  - screenRelativeHeight: 0.3
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 5140265890601630201}
+  - screenRelativeHeight: 0.1
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 5140265890601630201}
+  m_Enabled: 1
