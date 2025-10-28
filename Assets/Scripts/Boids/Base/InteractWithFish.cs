@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,11 +13,10 @@ public class InteractWithFish : MonoBehaviour
 
     void OnEnable()
     {
-        scareActionReference.action.performed += Scare();
-        lureActionReference.action.performed += Lure();
+
     }
 
-    private Action<InputAction.CallbackContext> Scare()
+    public void Scare(InputAction.CallbackContext context)
     {
         for (int i = 0; i < allSchools.value.Count; i++)
         {
@@ -26,14 +24,14 @@ public class InteractWithFish : MonoBehaviour
 
             if (Mathf.Abs(Vector3.Distance(pos, transform.position)) < scareRadius)
             {
-
+                allSchools.value[i].position = new Vector3(Random.Range(-200, 200),
+                                                            Random.Range(50, 150),
+                                                            Random.Range(-200, 200));
             }
         }
-
-        return null;
     }
 
-    private Action<InputAction.CallbackContext> Lure()
+    public void Lure(InputAction.CallbackContext context)
     {
         float closestDistance = float.PositiveInfinity;
         Debug.Log(allSchools.value.Count);
@@ -48,13 +46,10 @@ public class InteractWithFish : MonoBehaviour
                 allSchools.value[i].position = transform.position;
             }
         }
-
-        return null;
     }
 
     private void OnDisable()
     {
-        scareActionReference.action.started -= Scare();
-        lureActionReference.action.started -= Lure();
+
     }
 }
