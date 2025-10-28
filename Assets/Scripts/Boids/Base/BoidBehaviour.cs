@@ -6,7 +6,7 @@ public class BoidBehaviour : MonoBehaviour
 {
     [SerializeField] private Vector3 boundsExtents;
     [SerializeField] private float boundsRadius;
-    [SerializeField] public Transform boundsCenter;
+    public Transform boundsCenter;
     [SerializeField] private float forwardSpeed;
     [SerializeField] private float rotationSpeed;
 
@@ -25,7 +25,7 @@ public class BoidBehaviour : MonoBehaviour
 
     [SerializeField] private Vector3 direction;
 
-    [SerializeField] private TransformListValue allBoidsValue;
+    public TransformListValue allBoidsValue;
 
     [SerializeField] private bool debug;
 

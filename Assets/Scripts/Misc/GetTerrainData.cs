@@ -9,6 +9,7 @@ public class GetTerrainData : MonoBehaviour
     string heightPath = "Assets/Textures/HeightMap";
     string normalPath = "Assets/Textures/NormalMap";
 
+#if UNITY_EDITOR
     [Button]
     void GetHeighMap()
     {
@@ -31,4 +32,5 @@ public class GetTerrainData : MonoBehaviour
         AssetDatabase.Refresh();
         AssetDatabase.SaveAssets();
     }
+#endif
 }

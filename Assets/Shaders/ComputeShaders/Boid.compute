@@ -228,7 +228,7 @@ float3 safeNormalize(float3 v)
     return v / len;
 }
 
-// Checks if number is valid.
+// Checks if number is valid. found this in a sebastian lague video
 bool IsNaN(float val)
 {
     uint bits = asuint(val);

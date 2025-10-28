@@ -20,7 +20,7 @@ public class Flash : MonoBehaviour
     void FlashScreen()
     {
         Color color = image.color;
-        color.a = 1.0f;
+        color.a = 0.4f;
         image.color = color;
     }
 

@@ -269,7 +269,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 389961085}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 02944184f5639dc48b02413e1308be31, type: 3}
   m_Name: 
@@ -277,7 +277,7 @@ MonoBehaviour:
   boidGO: {fileID: 7459731157499397232, guid: 02a2d133d43ee3742b9b21ca5b6cb13f, type: 3}
   position: {fileID: 389961087}
   radius: 5
-  amount: 200
+  amount: 100
 --- !u!4 &389961087
 Transform:
   m_ObjectHideFlags: 0
@@ -302,6 +302,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1033579682345998465, guid: fa77a7fcd8ab1404788d89a9db9fc22f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1033579682345998465, guid: fa77a7fcd8ab1404788d89a9db9fc22f, type: 3}
       propertyPath: boidAmount
       value: 10000
       objectReference: {fileID: 0}
@@ -320,6 +324,10 @@ PrefabInstance:
     - target: {fileID: 1431056435537039894, guid: fa77a7fcd8ab1404788d89a9db9fc22f, type: 3}
       propertyPath: m_Name
       value: School
+      objectReference: {fileID: 0}
+    - target: {fileID: 1431056435537039894, guid: fa77a7fcd8ab1404788d89a9db9fc22f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2138180454571250526, guid: fa77a7fcd8ab1404788d89a9db9fc22f, type: 3}
       propertyPath: m_LocalPosition.x
